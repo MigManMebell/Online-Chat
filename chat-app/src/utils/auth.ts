@@ -13,9 +13,12 @@ export interface AuthPayload {
   nickname?: string;
 }
 
-export function signJwt(payload: AuthPayload, expiresIn: string = '7d'): string {
-  const options: SignOptions = { expiresIn };
-  return jwt.sign(payload as JwtPayload, JWT_SECRET, options);
+export function signJwt(
+  payload: AuthPayload,
+  expiresIn: string | number = '7d'
+): string {
+  const options = { expiresIn } as unknown as SignOptions;
+  return jwt.sign(payload as JwtPayload, JWT_SECRET, options) as string;
 }
 
 export function verifyJwt(token: string): AuthPayload {
