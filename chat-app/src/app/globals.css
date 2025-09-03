@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* Явное управление темой через data-theme */
+:root[data-theme='light'] {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+:root[data-theme='dark'] {
+  --background: #0b0f1a;
+  --foreground: #e6eaf2;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Улучшение контраста по умолчанию */
+*:where(:not(svg,svg *)) { color-scheme: light; }
+
+/* Простые анимации */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp { animation: fadeInUp 400ms ease-out both; }
+
+/* Небольшая стеклянная тень */
+.shadow-glass { box-shadow: 0 10px 30px rgba(24,38,95,0.15); }
+.backdrop-blur-xs { backdrop-filter: blur(2px); }
