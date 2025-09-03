@@ -4,9 +4,10 @@ import { User } from '../../../models/User';
 import bcrypt from 'bcryptjs';
 import { signJwt } from '../../../utils/auth';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: 'Method Not Allowed' });
+    return;
   }
   const { email, password } = req.body || {};
   if (!email || !password) {
@@ -16,16 +17,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      res.status(401).json({ message: 'Invalid credentials' });
+      return;
     }
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      res.status(401).json({ message: 'Invalid credentials' });
+      return;
     }
     const token = signJwt({ userId: String(user._id), nickname: user.nickname });
-    return res.status(200).json({ token, nickname: user.nickname });
+    res.status(200).json({ token, nickname: user.nickname });
+    return;
   } catch {
-    return res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error' });
+    return;
   }
 }
 

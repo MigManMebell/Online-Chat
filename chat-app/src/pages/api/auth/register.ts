@@ -3,9 +3,10 @@ import { connectToDatabase } from '../../../lib/mongodb';
 import { User } from '../../../models/User';
 import bcrypt from 'bcryptjs';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: 'Method Not Allowed' });
+    return;
   }
   const { email, password, nickname } = req.body || {};
   if (!email || !password || !nickname) {
@@ -15,13 +16,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
     const exists = await User.findOne({ email }).lean();
     if (exists) {
-      return res.status(409).json({ message: 'Email already registered' });
+      res.status(409).json({ message: 'Email already registered' });
+      return;
     }
     const hashed = await bcrypt.hash(password, 10);
     await User.create({ email, password: hashed, nickname });
-    return res.status(201).json({ message: 'User created' });
+    res.status(201).json({ message: 'User created' });
+    return;
   } catch {
-    return res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error' });
+    return;
   }
 }
 
