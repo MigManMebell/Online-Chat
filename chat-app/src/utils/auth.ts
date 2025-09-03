@@ -21,18 +21,24 @@ export function verifyJwt(token: string): AuthPayload {
 }
 
 export function withAuth(handler: NextApiHandler): NextApiHandler {
-  return async (req: NextApiRequest & { user?: AuthPayload }, res: NextApiResponse) => {
+  return async (
+    req: NextApiRequest & { user?: AuthPayload },
+    res: NextApiResponse
+  ): Promise<void> => {
     const authHeader = req.headers.authorization || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : undefined;
     if (!token) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
     }
     try {
       const decoded = verifyJwt(token);
       req.user = decoded;
-      return handler(req, res);
+      await (handler as NextApiHandler)(req as NextApiRequest, res as NextApiResponse);
+      return;
     } catch {
-      return res.status(401).json({ message: 'Invalid token' });
+      res.status(401).json({ message: 'Invalid token' });
+      return;
     }
   };
 }
