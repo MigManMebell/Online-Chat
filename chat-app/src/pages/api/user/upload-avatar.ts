@@ -13,7 +13,8 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
     return res.status(400).json({ message: 'Missing url' });
   }
   await connectToDatabase();
-  const userId = (req as any).user.userId as string;
+  const userId = (req as { user?: { userId: string } }).user?.userId;
+  if (!userId) return res.status(401).json({ message: 'Unauthorized' });
   const user = await User.findByIdAndUpdate(userId, { avatarUrl: url }, { new: true }).lean();
   return res.status(200).json({ user });
 });

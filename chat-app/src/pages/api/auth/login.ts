@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     const token = signJwt({ userId: String(user._id), nickname: user.nickname });
     return res.status(200).json({ token, nickname: user.nickname });
-  } catch (err) {
+  } catch {
     return res.status(500).json({ message: 'Server error' });
   }
 }

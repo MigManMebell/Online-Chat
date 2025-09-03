@@ -12,8 +12,9 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
     return res.status(400).json({ message: 'Nothing to update' });
   }
   await connectToDatabase();
-  const userId = (req as any).user.userId as string;
-  const update: any = {};
+  const userId = (req as { user?: { userId: string } }).user?.userId;
+  if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+  const update: Record<string, string> = {};
   if (typeof nickname === 'string' && nickname.trim()) update.nickname = nickname.trim();
   if (typeof avatarUrl === 'string' && avatarUrl.trim()) update.avatarUrl = avatarUrl.trim();
   const user = await User.findByIdAndUpdate(userId, update, { new: true }).lean();

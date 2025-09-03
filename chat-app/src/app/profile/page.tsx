@@ -47,6 +47,7 @@ export default function ProfilePage() {
         <div className="space-y-3">
           <input className="w-full border rounded px-3 py-2" placeholder="Никнейм" value={nickname} onChange={(e) => setNickname(e.target.value)} />
           {preview && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="preview" className="w-20 h-20 rounded-full object-cover" />
           )}
           <input className="w-full border rounded px-3 py-2" placeholder="Ссылка на аватар" value={avatarUrl} onChange={(e) => { setAvatarUrl(e.target.value); setPreview(e.target.value || null); }} />

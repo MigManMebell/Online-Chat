@@ -14,16 +14,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
       try {
         if (!token) return next(new Error('Unauthorized'));
         const payload = verifyJwt(token);
-        (socket as any).user = payload;
+        (socket as { user?: { userId: string; nickname?: string } }).user = payload;
         next();
-      } catch (e) {
+      } catch {
         next(new Error('Unauthorized'));
       }
     });
 
     io.on('connection', (socket) => {
       socket.on('message', async (data: { content: string; nickname: string }) => {
-        const user = (socket as any).user as { userId: string; nickname?: string };
+        const user = (socket as { user?: { userId: string; nickname?: string } }).user;
         if (!user) return;
         await connectToDatabase();
         const doc = await Message.create({
