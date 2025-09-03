@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import type { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || '';
+const JWT_SECRET: Secret = (process.env.JWT_SECRET || '') as Secret;
 
 if (!JWT_SECRET) {
   throw new Error('Please define JWT_SECRET in .env.local');
@@ -13,11 +14,16 @@ export interface AuthPayload {
 }
 
 export function signJwt(payload: AuthPayload, expiresIn: string = '7d'): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn });
+  const options: SignOptions = { expiresIn };
+  return jwt.sign(payload as JwtPayload, JWT_SECRET, options);
 }
 
 export function verifyJwt(token: string): AuthPayload {
-  return jwt.verify(token, JWT_SECRET) as AuthPayload;
+  const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload | string;
+  if (typeof decoded === 'string') {
+    throw new Error('Invalid token payload');
+  }
+  return decoded as unknown as AuthPayload;
 }
 
 export function withAuth(handler: NextApiHandler): NextApiHandler {
